@@ -1,0 +1,9 @@
+* text=auto
+
+# GitHub Pages parses CNAME strictly; never let it gain a CR
+CNAME text eol=lf
+
+# binary, never touch line endings
+*.webp binary
+*.jpg  binary
+*.png  binary

@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ==========================================================================
+     HOW TO EDIT THIS SITE
+
+     Email
+       Lives in exactly ONE place: the mailto: href on the #email-link
+       anchor in the Contact section. The visible text syncs itself from
+       that href, so changing the mailto: is the only edit needed when the
+       domain email is ready.
+
+     Screenshots
+       Live, in ./images/. Both app cards use a .shots grid. The tracker pair
+       adds .shots--phone, which caps portrait shots at 760px tall and centres
+       them; the Second Brain pair is .shots--wide, one full-width image per
+       row. To swap an image, keep the same filename or update the width/height
+       attributes to match, so nothing shifts while it loads. Capture width has
+       to track display width — see scripts/README.md before regenerating.
+
+     Domain
+       Served at https://prajith.net via GitHub Pages, with the domain set by
+       the CNAME file in this folder. Only the three share-preview tags in the
+       head hardcode that domain; everything else is relative, so the page
+       still opens correctly as a local file.
+     ========================================================================== -->
+
+<title>Prajith Ganesh M — Building PRAZE</title>
+<meta name="description" content="16-year-old builder from Chennai, India. Building PRAZE — a self-improvement brand spanning fitness, business, and content. Offline-first apps, content systems, and shipped work.">
+<meta name="theme-color" content="#08080a">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Prajith Ganesh M — Building PRAZE">
+<meta property="og:description" content="Offline-first apps, a content brand, and an automated video pipeline. Built while finishing school in Chennai.">
+
+<!-- Share preview. The image URL is absolute because crawlers resolve it
+     independently of the page, so a relative path gives most of them nothing.
+     If the domain ever changes, these three URLs change with it.
+
+     JPEG, not WebP: at matching quality WebP blotched this image badly, because
+     its encoder flattens the low-contrast film grain into blocks. JPEG q95
+     keeps the grain, is 90 KB instead of 516, and every crawler reads it.
+     Regenerate with scripts/og-banner.js. -->
+<meta property="og:url" content="https://prajith.net/">
+<meta property="og:image" content="https://prajith.net/images/og-banner.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Prajith Ganesh M — Building PRAZE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Prajith Ganesh M — Building PRAZE">
+<meta name="twitter:description" content="Offline-first apps, a content brand, and an automated video pipeline. Built while finishing school in Chennai.">
+<meta name="twitter:image" content="https://prajith.net/images/og-banner.jpg">
+<meta name="twitter:image:alt" content="Prajith Ganesh M — Building PRAZE">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2308080a'/%3E%3Ctext x='50' y='72' font-size='64' font-weight='700' font-family='Segoe UI,Helvetica,Arial' fill='%23f2643a' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+
+<style>
+/* ---------------------------------------------------------------- tokens -- */
+:root{
+  --bg:        #08080a;
+  --bg-raised: #0e0e12;
+  --line:      #1e1e24;
+  --line-soft: #16161b;
+  --text:      #ececef;
+  --text-dim:  #9a9aa4;
+  --text-mute: #6b6b75;
+  --accent:    #f2643a;
+  --accent-dim:#c14a27;
+
+  --max: 1060px;
+  --pad: clamp(20px, 5vw, 40px);
+
+  --font: "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas,
+          "Liberation Mono", monospace;
+}
+
+/* ------------------------------------------------------------------ base -- */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  font-size:17px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+h1,h2,h3{margin:0;line-height:1.1;letter-spacing:-0.025em;font-weight:650}
+p{margin:0}
+a{color:inherit}
+ul{margin:0;padding:0;list-style:none}
+
+/* film grain — matches the PRAZE visual identity, costs zero requests */
+body::after{
+  content:"";position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.wrap{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--pad)}
+
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:1000;
+  background:var(--accent);color:#08080a;padding:10px 16px;font-weight:600;
+}
+.skip:focus{left:8px;top:8px}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* ------------------------------------------------------------------ nav --- */
+.nav{
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid transparent;
+  transition:border-color .25s, background .25s;
+}
+.nav.scrolled{
+  background:rgba(8,8,10,.82);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom-color:var(--line-soft);
+}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:62px}
+.mark{
+  font-weight:750;letter-spacing:.16em;font-size:14px;text-decoration:none;
+}
+.mark span{color:var(--accent)}
+.nav-links{display:flex;gap:26px}
+.nav-links a{
+  text-decoration:none;font-size:13.5px;letter-spacing:.04em;color:var(--text-dim);
+  transition:color .18s;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+@media (max-width:560px){ .nav-links{gap:18px} .nav-links a{font-size:12.5px} }
+
+/* ----------------------------------------------------------------- hero --- */
+.hero{padding:clamp(70px,13vh,130px) 0 clamp(64px,10vh,104px);position:relative}
+.hero::before{
+  content:"";position:absolute;top:-140px;left:50%;transform:translateX(-50%);
+  width:min(900px,120vw);height:460px;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(242,100,58,.11),transparent 68%);
+}
+.hero > .wrap{position:relative}
+
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:22px;
+}
+.hero h1{
+  font-size:clamp(2.6rem,8.2vw,4.6rem);
+  font-weight:700;letter-spacing:-.04em;margin-bottom:26px;
+}
+.lead{
+  font-size:clamp(1.06rem,2.4vw,1.3rem);
+  color:var(--text-dim);max-width:60ch;line-height:1.62;
+}
+.lead + .lead{margin-top:18px}
+.lead strong{color:var(--text);font-weight:600}
+
+.facts{
+  display:flex;flex-wrap:wrap;gap:0;margin-top:44px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.fact{
+  padding:18px 30px 18px 0;margin-right:30px;
+  border-right:1px solid var(--line-soft);
+}
+.fact:last-child{border-right:0;margin-right:0;padding-right:0}
+.fact dt{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-mute);margin-bottom:5px;
+}
+.fact dd{margin:0;font-size:15px;color:var(--text)}
+@media (max-width:620px){
+  .facts{flex-direction:column}
+  .fact{border-right:0;border-bottom:1px solid var(--line-soft);
+        margin-right:0;padding:14px 0}
+  .fact:last-child{border-bottom:0}
+}
+
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:38px}
+.btn{
+  display:inline-block;text-decoration:none;font-size:14.5px;font-weight:600;
+  padding:12px 22px;border-radius:2px;transition:.18s;
+}
+.btn-solid{background:var(--accent);color:#08080a}
+.btn-solid:hover{background:#ff7a52}
+.btn-ghost{border:1px solid var(--line);color:var(--text-dim)}
+.btn-ghost:hover{border-color:var(--text-mute);color:var(--text)}
+
+/* -------------------------------------------------------------- sections -- */
+section[id]{scroll-margin-top:74px}
+.sec{padding:clamp(60px,9vh,100px) 0;border-top:1px solid var(--line-soft)}
+.sec-head{margin-bottom:clamp(38px,6vh,60px)}
+.sec-num{
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--accent);
+  display:block;margin-bottom:12px;
+}
+.sec-head h2{font-size:clamp(1.7rem,4.4vw,2.3rem)}
+.sec-head p{color:var(--text-dim);margin-top:14px;max-width:58ch;font-size:15.5px}
+
+/* -------------------------------------------------------------- projects -- */
+.projects{display:flex;flex-direction:column;gap:clamp(18px,3vw,26px)}
+
+.card{
+  background:var(--bg-raised);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:clamp(24px,4.2vw,40px);
+  position:relative;
+  transition:border-color .25s, transform .25s;
+}
+.card:hover{border-color:#2c2c34;transform:translateY(-2px)}
+
+.card-top{
+  display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px;
+}
+.card-idx{
+  font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.1em;
+}
+.card h3{font-size:clamp(1.25rem,3.2vw,1.6rem)}
+
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 22px}
+.tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  color:var(--text-dim);border:1px solid var(--line);
+  padding:4px 9px;border-radius:2px;white-space:nowrap;
+}
+
+.blocks{display:grid;gap:20px}
+@media (min-width:800px){ .blocks{grid-template-columns:1fr 1fr;gap:26px 38px} }
+.block-wide{grid-column:1/-1}
+
+.label{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-mute);
+  display:block;margin-bottom:9px;
+}
+.block p{color:var(--text-dim);font-size:15.5px;line-height:1.62}
+.block strong{color:var(--text);font-weight:600}
+
+.bullets li{
+  position:relative;padding-left:18px;margin-bottom:9px;
+  color:var(--text-dim);font-size:15.5px;line-height:1.55;
+}
+.bullets li:last-child{margin-bottom:0}
+.bullets li::before{
+  content:"";position:absolute;left:0;top:.62em;
+  width:6px;height:1px;background:var(--accent-dim);
+}
+.bullets strong{color:var(--text);font-weight:600}
+
+/* v1 / v2 / v3 iteration rail */
+.rail{border-left:1px solid var(--line);padding-left:22px;display:grid;gap:20px}
+.step{position:relative}
+.step::before{
+  content:"";position:absolute;left:-26px;top:8px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--bg-raised);border:1px solid var(--accent-dim);
+}
+.step:last-child::before{background:var(--accent);border-color:var(--accent)}
+.step h4{
+  margin:0 0 5px;font-size:14px;font-weight:650;letter-spacing:.02em;
+}
+.step h4 em{
+  font-style:normal;font-family:var(--mono);font-size:11.5px;
+  color:var(--accent);margin-right:9px;letter-spacing:.1em;
+}
+.step p{color:var(--text-dim);font-size:14.5px;line-height:1.58}
+
+/* screenshot slots — dormant until an image is dropped in, no layout shift */
+.shots{grid-column:1/-1;display:grid;gap:14px;margin-top:6px}
+@media (min-width:640px){ .shots.two{grid-template-columns:1fr 1fr} }
+.shot{margin:0;min-width:0}
+.shot img{
+  display:block;width:100%;height:auto;
+  border:1px solid var(--line);border-radius:3px;background:#000;
+}
+/* Landscape captures run full width, one per row. Squeezed into a half-width
+   column the app's own layout shrinks ~2.7x and its UI text lands around 5px,
+   which no amount of source resolution can rescue. Full width means the
+   screenshot is shown at roughly the size it was captured at. */
+.shots--wide{grid-template-columns:1fr}
+.shot figcaption{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-mute);margin-top:9px;
+}
+/* Honesty label: the screenshots show seeded demo content, not real usage.
+   Same type as the rest of the caption, just quieter — it should read as the
+   tail of the caption rather than as a warning. */
+.shot figcaption .sd{opacity:.55;white-space:nowrap}
+/* Phone-shaped captures (the tracker is a mobile app). Cap the height so a
+   tall portrait shot doesn't run away with the card, and centre it in its
+   column instead of stretching to fill. */
+.shots--phone{align-items:start}
+.shots--phone .shot img{
+  width:auto;max-width:100%;max-height:760px;margin-inline:auto;
+}
+.shots--phone .shot figcaption{text-align:center}
+
+.card-link{
+  display:inline-flex;align-items:center;gap:8px;margin-top:26px;
+  font-size:14px;font-weight:600;text-decoration:none;color:var(--accent);
+  border-bottom:1px solid transparent;padding-bottom:2px;transition:.18s;
+}
+.card-link:hover{border-bottom-color:var(--accent)}
+.card-link::after{content:"→";transition:transform .18s}
+.card-link:hover::after{transform:translateX(3px)}
+
+/* early venture note */
+.note{
+  border-left:2px solid var(--accent-dim);
+  padding:4px 0 4px 26px;margin-top:clamp(30px,5vw,44px);
+}
+.note h3{font-size:1.15rem;margin-bottom:12px}
+.note p{color:var(--text-dim);font-size:15.5px;max-width:70ch}
+.note strong{color:var(--text);font-weight:600}
+
+/* ---------------------------------------------------------------- skills -- */
+.skills{display:grid;gap:clamp(26px,4vw,38px)}
+@media (min-width:760px){ .skills{grid-template-columns:repeat(3,1fr)} }
+.skill{border-top:1px solid var(--line);padding-top:20px}
+.skill h3{font-size:1.02rem;margin-bottom:14px}
+.skill li{
+  color:var(--text-dim);font-size:14.8px;padding:5px 0;line-height:1.5;
+}
+
+/* --------------------------------------------------------------- contact -- */
+.contact-lead{
+  font-size:clamp(1.3rem,3.6vw,1.75rem);font-weight:600;letter-spacing:-.02em;
+  max-width:24ch;line-height:1.28;
+}
+.contact-sub{color:var(--text-dim);margin-top:16px;max-width:56ch;font-size:15.5px}
+.contact-list{margin-top:34px;border-top:1px solid var(--line)}
+.contact-list li{border-bottom:1px solid var(--line)}
+.contact-list a{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:17px 0;text-decoration:none;transition:padding .2s,color .2s;
+  color:var(--text);font-size:16px;
+}
+.contact-list a:hover{padding-left:9px;color:var(--accent)}
+.contact-list .k{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-mute);flex:0 0 auto;
+}
+.contact-list .v{text-align:right;word-break:break-all}
+
+footer{
+  border-top:1px solid var(--line-soft);padding:30px 0 40px;
+  color:var(--text-mute);font-size:13px;
+}
+.foot-in{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+/* ---------------------------------------------------------------- motion -- */
+.rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .card:hover{transform:none}
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#work">Skip to the work</a>
+
+<nav class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="mark" href="#top">PRA<span>Z</span>E</a>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ============================================================= HERO -- -->
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Chennai, India</p>
+
+      <h1>Prajith Ganesh M</h1>
+
+      <p class="lead">
+        I'm 16 and still in school. I'm building <strong>PRAZE</strong>, a
+        self-improvement brand covering fitness, business, and content.
+      </p>
+      <p class="lead">
+        Two offline-first apps I use every day. A content brand I built from
+        zero, and an automated video pipeline to scale it. Everything below is
+        already running.
+      </p>
+
+      <dl class="facts">
+        <div class="fact">
+          <dt>Studying</dt>
+          <dd>AS Level — English, Chemistry, Business</dd>
+        </div>
+        <div class="fact">
+          <dt>Applying to</dt>
+          <dd>Business &amp; entrepreneurship programmes</dd>
+        </div>
+        <div class="fact">
+          <dt>Building</dt>
+          <dd>PRAZE — fitness, business, content</dd>
+        </div>
+      </dl>
+
+      <div class="cta">
+        <a class="btn btn-solid" href="#work">See the work</a>
+        <a class="btn btn-ghost" href="#contact">Get in touch</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================= WORK -- -->
+  <section class="sec" id="work">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <span class="sec-num">01 / Work</span>
+        <h2>What I've built</h2>
+        <p>
+          Four projects, all self-directed. Each one exists because I needed it
+          and nothing off the shelf did the job.
+        </p>
+      </div>
+
+      <div class="projects">
+
+        <!-- ---------------------------------------- PRAZE Fitness Tracker -->
+        <article class="card rv">
+          <div class="card-top">
+            <span class="card-idx">01</span>
+            <h3>PRAZE Fitness Tracker</h3>
+          </div>
+
+          <div class="tags">
+            <span class="tag">HTML / CSS / JS</span>
+            <span class="tag">IndexedDB</span>
+            <span class="tag">PWA</span>
+            <span class="tag">Capacitor / Android</span>
+            <span class="tag">Offline-first</span>
+            <span class="tag">No build step</span>
+            <span class="tag">Live</span>
+          </div>
+
+          <div class="blocks">
+            <div class="block">
+              <span class="label">What it is</span>
+              <p>
+                A fitness tracking web app that lives in <strong>a single HTML
+                file</strong>. No build step, no server, no account. It loads
+                once, then works completely offline. That last part is the whole
+                point, because gyms have no signal.
+              </p>
+            </div>
+
+            <div class="block">
+              <span class="label">Why it matters</span>
+              <p>
+                I didn't build this once and call it done. Three iterations,
+                each one driven by something that annoyed me mid-workout.
+                <strong>Use it, find the gap, ship the fix.</strong> That loop
+                is the part I care about.
+              </p>
+            </div>
+
+            <div class="block block-wide">
+              <span class="label">What I built · three iterations</span>
+              <div class="rail">
+                <div class="step">
+                  <h4><em>v1</em>Core tracker</h4>
+                  <p>Logging workouts, exercises, sets, reps, and weight. The smallest version that was actually useful.</p>
+                </div>
+                <div class="step">
+                  <h4><em>v2</em>Persistence and portability</h4>
+                  <p>
+                    Durable local storage with IndexedDB. PWA install support, so
+                    it sits on the home screen. Rest timers between sets, a kg/lb
+                    unit toggle, and reusable training templates.
+                  </p>
+                </div>
+                <div class="step">
+                  <h4><em>v3</em>Progression intelligence</h4>
+                  <p>
+                    Exercise set tagging, a plate calculator, a "Journey" view for
+                    progress over time, personal records tracking, estimated
+                    one-rep max (e1RM) calculation, and milestone celebrations.
+                  </p>
+                </div>
+                <div class="step">
+                  <h4><em>+</em>Native Android</h4>
+                  <p>
+                    Wrapped with Capacitor into an installable Android app, with
+                    custom icons and a splash screen.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="shots two shots--phone">
+              <figure class="shot">
+                <img src="images/tracker-log.webp" width="1075" height="2050" loading="lazy" decoding="async"
+                     alt="The tracker's logging screen: an open session with sets tagged as warm-up, working and drop, a weight and reps stepper, and a Log Set button.">
+                <figcaption>Logging · tagged sets <span class="sd">(sample data)</span></figcaption>
+              </figure>
+              <figure class="shot">
+                <img src="images/tracker-journey.webp" width="1075" height="2050" loading="lazy" decoding="async"
+                     alt="The Journey view showing bodyweight going from 67.4 to 70.1 kg over a month.">
+                <figcaption>Journey · progress over time <span class="sd">(sample data)</span></figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <a class="card-link" href="https://prajith-max9.github.io/praze-website/fitness.html" target="_blank" rel="noopener">
+            Open the live app
+          </a>
+        </article>
+
+        <!-- ------------------------------------------- PRAZE Second Brain -->
+        <article class="card rv">
+          <div class="card-top">
+            <span class="card-idx">02</span>
+            <h3>PRAZE Second Brain</h3>
+          </div>
+
+          <div class="tags">
+            <span class="tag">TF-IDF</span>
+            <span class="tag">Knowledge graph</span>
+            <span class="tag">Offline retrieval</span>
+            <span class="tag">Web Speech API</span>
+            <span class="tag">PWA</span>
+            <span class="tag">Live</span>
+          </div>
+
+          <div class="blocks">
+            <div class="block">
+              <span class="label">What it is</span>
+              <p>
+                A personal knowledge management app: notes, diary, idea capture,
+                and goal tracking in one offline-first tool. <strong>No account,
+                no server, no API key.</strong> Every core feature works with the
+                network switched off.
+              </p>
+            </div>
+
+            <div class="block">
+              <span class="label">Why it matters</span>
+              <p>
+                Most note apps keep your notes on someone else's server, behind
+                a login and a subscription. This one runs on my machine and
+                answers questions from my own notes without a single network
+                call.
+              </p>
+            </div>
+
+            <div class="block block-wide">
+              <span class="label">What I built</span>
+              <ul class="bullets">
+                <li><strong>TF-IDF auto-linking</strong> finds related notes by content similarity, so connections show up without me tagging anything by hand.</li>
+                <li><strong>Wiki-style linking</strong> and a <strong>visual knowledge graph</strong> with pan and zoom, so I can see how ideas cluster.</li>
+                <li><strong>Local retrieval-based "Ask"</strong> answers questions from my own notes entirely offline. There's an optional AI-powered mode when I want it.</li>
+                <li><strong>Command palette (Cmd+K)</strong> for keyboard-first navigation, and <strong>voice dictation</strong> for diary entries.</li>
+                <li>Shipped across <strong>multiple pull requests, all merged and live</strong>, in reviewable increments rather than one dump of code.</li>
+              </ul>
+            </div>
+
+            <div class="shots shots--wide">
+              <figure class="shot">
+                <img src="images/brain-graph.webp" width="2250" height="1600" loading="lazy" decoding="async"
+                     alt="The knowledge graph: notes as nodes, joined by solid wiki-link edges and dashed similarity edges found by the TF-IDF engine.">
+                <figcaption>Knowledge graph <span class="sd">(sample data)</span></figcaption>
+              </figure>
+              <figure class="shot">
+                <img src="images/brain-ask.webp" width="2250" height="1900" loading="lazy" decoding="async"
+                     alt="The Ask tab answering a question offline by ranking the closest notes, labelled 'Answers come only from your own notes'.">
+                <figcaption>Offline Ask · local retrieval <span class="sd">(sample data)</span></figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <a class="card-link" href="https://prajith-max9.github.io/praze-website/brain.html" target="_blank" rel="noopener">
+            Open the live app
+          </a>
+        </article>
+
+        <!-- ---------------------------------------------------- @praze_ig -->
+        <article class="card rv">
+          <div class="card-top">
+            <span class="card-idx">03</span>
+            <h3>@praze_ig — Content Brand</h3>
+          </div>
+
+          <div class="tags">
+            <span class="tag">Brand identity</span>
+            <span class="tag">ffmpeg</span>
+            <span class="tag">Colour grading</span>
+            <span class="tag">Short-form video</span>
+          </div>
+
+          <div class="blocks">
+            <div class="block">
+              <span class="label">What it is</span>
+              <p>
+                A content brand I started from zero, with a dark, cinematic
+                visual identity built around one line:
+                <strong>"BUILT NOT BORN."</strong>
+              </p>
+            </div>
+
+            <div class="block">
+              <span class="label">Why it matters</span>
+              <p>
+                It documents my own journey building PRAZE in public: training,
+                building, and business progress as <strong>one continuous
+                story</strong>. Making something is half the job. Distribution is
+                the other half, and you only learn that by doing it in the open.
+              </p>
+            </div>
+
+            <div class="block block-wide">
+              <span class="label">What I built</span>
+              <ul class="bullets">
+                <li>A custom colour system and visual language applied consistently across every piece of content.</li>
+                <li>Reels shot and edited myself, with <strong>professional colour grading, film grain, and vignette</strong> applied through ffmpeg. The look is a repeatable process, not a filter I clicked once.</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- ------------------------------------------------ Reel pipeline -->
+        <article class="card rv">
+          <div class="card-top">
+            <span class="card-idx">04</span>
+            <h3>Vertical Reel Production Pipeline</h3>
+          </div>
+
+          <div class="tags">
+            <span class="tag">TypeScript</span>
+            <span class="tag">Remotion</span>
+            <span class="tag">whisper.cpp</span>
+            <span class="tag">Automation</span>
+          </div>
+
+          <div class="blocks">
+            <div class="block">
+              <span class="label">What it is</span>
+              <p>
+                An automated pipeline for producing vertical short-form video,
+                built in TypeScript with Remotion. Video is
+                <strong>rendered from code</strong> instead of assembled by hand
+                in an editor.
+              </p>
+            </div>
+
+            <div class="block">
+              <span class="label">Why it matters</span>
+              <p>
+                Manual editing puts a hard ceiling on how much I can publish. I
+                built this to <strong>scale content production for @praze_ig</strong>
+                past what my own editing hours allow. It turns a creative
+                bottleneck into an engineering problem.
+              </p>
+            </div>
+
+            <div class="block block-wide">
+              <span class="label">What I built</span>
+              <ul class="bullets">
+                <li><strong>Automatic speech-to-text captioning</strong> via whisper.cpp, which runs locally.</li>
+                <li>Captions synced <strong>word by word</strong> to the video. That timing style is what short-form platforms reward.</li>
+                <li><strong>Programmatic caption rendering</strong>, so styling is defined once in code and applied to every video.</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ----------------------------------------------- early venture --- -->
+      <aside class="note rv">
+        <h3>Before any of this — age 13</h3>
+        <p>
+          I spotted a real arbitrage. <strong>Prime Hydration</strong> was almost
+          impossible to get in India and was trading at large markups. I sourced
+          bottles, negotiated payment <strong>in goods rather than cash</strong>,
+          resold at a markup, and put the profit back into more inventory. It was
+          a self-contained buy-low-sell-high loop that I ran and scaled myself.
+          No one taught me the model.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =========================================================== SKILLS -- -->
+  <section class="sec" id="skills">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <span class="sec-num">02 / Skills</span>
+        <h2>What I can actually do</h2>
+        <p>All of this came from building the things above, not from a course.</p>
+      </div>
+
+      <div class="skills rv">
+        <div class="skill">
+          <h3>Full-stack web development</h3>
+          <ul>
+            <li>HTML, CSS, JavaScript</li>
+            <li>TypeScript</li>
+            <li>Offline-first architecture</li>
+            <li>IndexedDB &amp; local persistence</li>
+            <li>Progressive Web Apps</li>
+            <li>Capacitor (web → Android)</li>
+            <li>Git &amp; pull-request workflow</li>
+          </ul>
+        </div>
+        <div class="skill">
+          <h3>Content production</h3>
+          <ul>
+            <li>Video editing &amp; colour grading</li>
+            <li>ffmpeg</li>
+            <li>Remotion (video from code)</li>
+            <li>whisper.cpp captioning</li>
+            <li>Visual branding &amp; colour systems</li>
+            <li>Short-form / vertical formats</li>
+          </ul>
+        </div>
+        <div class="skill">
+          <h3>Business fundamentals</h3>
+          <ul>
+            <li>Sourcing &amp; supplier negotiation</li>
+            <li>Pricing &amp; margin</li>
+            <li>Inventory &amp; reinvestment</li>
+            <li>Brand positioning</li>
+            <li>Audience building</li>
+            <li>Shipping to a real deadline</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== CONTACT -- -->
+  <section class="sec" id="contact">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <span class="sec-num">03 / Contact</span>
+      </div>
+
+      <div class="rv">
+        <p class="contact-lead">Get in touch.</p>
+        <p class="contact-sub">
+          Happy to talk about any of the projects above, or about studying
+          business and entrepreneurship.
+        </p>
+
+        <ul class="contact-list">
+          <li>
+            <!-- ══ THE ONLY PLACE THE EMAIL LIVES ══════════════════════════
+                 To switch to a domain email later, change the mailto: below
+                 and nothing else. The visible address syncs itself from this
+                 href at load, so the two can never drift apart.
+                 ═════════════════════════════════════════════════════════ -->
+            <a id="email-link" href="mailto:prajithganesh.m@gmail.com">
+              <span class="k">Email</span>
+              <span class="v" data-email-text>prajithganesh.m@gmail.com</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://instagram.com/praze_ig" target="_blank" rel="noopener">
+              <span class="k">Instagram</span>
+              <span class="v">@praze_ig</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>Prajith Ganesh M</span>
+    <span>Chennai, India · Built by hand</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* The mailto: href is the single source of truth for the address.
+     Mirror it into the visible text so swapping in a domain email later
+     is a one-line change. Falls back to the hardcoded text without JS. */
+  var mail = document.getElementById("email-link");
+  if (mail) {
+    var addr = mail.getAttribute("href").replace(/^mailto:/i, "").split("?")[0];
+    document.querySelectorAll("[data-email-text]").forEach(function (el) {
+      el.textContent = addr;
+    });
+  }
+
+  /* sticky nav gets a border + blur once you leave the hero */
+  var nav = document.getElementById("nav");
+  var onScroll = function () {
+    nav.classList.toggle("scrolled", window.scrollY > 24);
+  };
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  /* reveal on scroll — skipped entirely if the user prefers reduced motion */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var items = document.querySelectorAll(".rv");
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    items.forEach(function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add("in");
+          io.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
+    items.forEach(function (el) { io.observe(el); });
+  }
+
+  /* highlight the nav link for whichever section you're looking at */
+  var sections = ["work", "skills", "contact"].map(function (id) {
+    return document.getElementById(id);
+  });
+  var links = {};
+  document.querySelectorAll(".nav-links a").forEach(function (a) {
+    links[a.getAttribute("href").slice(1)] = a;
+  });
+
+  if ("IntersectionObserver" in window) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var link = links[e.target.id];
+        if (!link) return;
+        if (e.isIntersecting) {
+          Object.keys(links).forEach(function (k) {
+            links[k].classList.remove("active");
+          });
+          link.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    sections.forEach(function (s) { if (s) spy.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

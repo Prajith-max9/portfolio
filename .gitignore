@@ -1,0 +1,7 @@
+# Playwright, if ever installed locally for the scripts in ./scripts
+node_modules/
+package-lock.json
+
+# intermediate PNGs from the seed scripts; the site ships the .webp versions
+images/*.png
+!images/og-banner.png
