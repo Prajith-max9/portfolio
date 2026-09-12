@@ -67,7 +67,12 @@
   --line-soft: #16161b;
   --text:      #ececef;
   --text-dim:  #9a9aa4;
-  --text-mute: #6b6b75;
+  /* #85858f, not darker: this token colours real text (section labels, the
+     fact labels, figcaptions, footer). At the old #6b6b75 those ran ~3.7:1
+     against the near-black backgrounds, under the 4.5:1 WCAG AA floor for
+     small text. This value clears 5.3:1 everywhere while staying visibly
+     dimmer than --text-dim, so the type hierarchy holds. */
+  --text-mute: #85858f;
   --accent:    #f2643a;
   --accent-dim:#c14a27;
 
