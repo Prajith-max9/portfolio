@@ -295,12 +295,14 @@ section[id]{scroll-margin-top:74px}
 .shots--wide{grid-template-columns:1fr}
 .shot figcaption{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--text-mute);margin-top:9px;
+  text-transform:uppercase;color:var(--text-dim);margin-top:9px;
 }
 /* Honesty label: the screenshots show seeded demo content, not real usage.
-   Same type as the rest of the caption, just quieter — it should read as the
-   tail of the caption rather than as a warning. */
-.shot figcaption .sd{opacity:.55;white-space:nowrap}
+   Same type as the rest of the caption, one step quieter. The distinction is
+   carried by color (dim caption, muted label), not opacity — an opacity fade
+   dropped this below the 4.5:1 AA floor, and disclosure text is the last
+   thing on the page that should be hard to read. */
+.shot figcaption .sd{color:var(--text-mute);white-space:nowrap}
 /* Phone-shaped captures (the tracker is a mobile app). Cap the height so a
    tall portrait shot doesn't run away with the card, and centre it in its
    column instead of stretching to fill. */
