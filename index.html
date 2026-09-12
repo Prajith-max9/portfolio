@@ -321,6 +321,10 @@ section[id]{scroll-margin-top:74px}
 }
 .note h3{font-size:1.15rem;margin-bottom:12px}
 .note p{color:var(--text-dim);font-size:15.5px;max-width:70ch}
+/* Single photo under the early-venture note. Reuses .shot for the frame and
+   caption, but sits outside any .shots grid, so it needs its own width cap
+   rather than a column to fill. */
+.note-photo{max-width:420px;margin-top:24px}
 .note strong{color:var(--text);font-weight:600}
 
 /* ---------------------------------------------------------------- skills -- */
@@ -690,15 +694,30 @@ footer{
 
       <!-- ----------------------------------------------- early venture --- -->
       <aside class="note rv">
-        <h3>Before any of this — age 13</h3>
+        <h3>Before any of this — ages 13 to 14</h3>
         <p>
-          I spotted a real arbitrage. <strong>Prime Hydration</strong> was almost
-          impossible to get in India and was trading at large markups. I sourced
-          bottles, negotiated payment <strong>in goods rather than cash</strong>,
-          resold at a markup, and put the profit back into more inventory. It was
-          a self-contained buy-low-sell-high loop that I ran and scaled myself.
-          No one taught me the model.
+          Prime Hydration was almost impossible to get in India. When you could
+          find it, it went for ₹3,000. A classmate's dad kept bringing bottles
+          back from Canada, so I bought from the classmate. There was a specific
+          chocolate he wanted more than cash, and it was hard to get. I paid him
+          about ₹50 of it per bottle and sold at ₹500. Next time he put his price
+          up. He'd figured out I'd pay. His brother heard us haggling and offered
+          the same bottles at around ₹22, since he wanted in. I bought from the
+          brother after that. Indian school kids don't have their own money. At
+          ₹500 there was maybe one person per classroom who could buy. I ran out
+          of buyers before I ran out of stock, and drank the rest myself.
         </p>
+
+        <!-- PHOTO SLOT — for the empty Prime bottle. Put the file in ./images/
+             and delete this comment's opening and closing lines. Set
+             width/height to the photo's real pixel dimensions once it's taken.
+
+        <figure class="shot note-photo">
+          <img src="images/prime-bottle.jpg" width="1200" height="1600" loading="lazy" decoding="async"
+               alt="The empty Prime Hydration bottle kept from the first sale.">
+          <figcaption>The one I kept</figcaption>
+        </figure>
+        -->
       </aside>
     </div>
   </section>
