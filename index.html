@@ -321,13 +321,16 @@ section[id]{scroll-margin-top:74px}
 .card-link::after{content:"→";transition:transform .18s}
 .card-link:hover::after{transform:translateX(3px)}
 
-/* early venture note */
+/* Before-PRAZE stories. One rule set, three asides, so they can't drift
+   apart visually. The global p{margin:0} means multi-paragraph stories need
+   the p + p rule or they render as one wall of text. */
 .note{
   border-left:2px solid var(--accent-dim);
   padding:4px 0 4px 26px;margin-top:clamp(30px,5vw,44px);
 }
 .note h3{font-size:1.15rem;margin-bottom:12px}
 .note p{color:var(--text-dim);font-size:15.5px;max-width:70ch}
+.note p + p{margin-top:14px}
 /* Single photo under the early-venture note. Reuses .shot for the frame and
    caption, but sits outside any .shots grid, so it needs its own width cap
    rather than a column to fill. */
@@ -389,6 +392,7 @@ footer{
     <a class="mark" href="#top">PRA<span>Z</span>E</a>
     <div class="nav-links">
       <a href="#work">Work</a>
+      <a href="#before-praze">Before PRAZE</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
     </div>
@@ -698,10 +702,35 @@ footer{
         </article>
 
       </div>
+    </div>
+  </section>
 
-      <!-- ----------------------------------------------- early venture --- -->
+  <!-- ===================================================== BEFORE PRAZE -- -->
+  <section class="sec" id="before-praze">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <span class="sec-num">02 / Before PRAZE</span>
+        <h2>Before PRAZE</h2>
+        <p>Three things that happened before any of this existed. Not all of
+        them worked.</p>
+      </div>
+
       <aside class="note rv">
-        <h3>Before any of this — ages 13 to 14</h3>
+        <h3>The juice business — age 12</h3>
+        <p>
+          A friend's younger brother had access to their family juicer. The
+          plan was simple: buy fruit from a local shop, juice it, sell it to
+          the security guards at my apartment complex. My friend talked me out
+          of it — he didn't trust his brother to actually show up — so it never
+          launched. Years later I worked out that wasn't the real problem. I'd
+          picked customers by who was nearby, not by who could actually pay.
+          Security guards work hourly wages. There was never a market there to
+          begin with.
+        </p>
+      </aside>
+
+      <aside class="note rv">
+        <h3>Prime Hydration — ages 13 to 14</h3>
         <p>
           Prime Hydration was almost impossible to get in India. When you could
           find it, it went for ₹3,000. A classmate's dad kept bringing bottles
@@ -723,6 +752,32 @@ footer{
                alt="Three PRIME Hydration flavours: Tropical Punch, Meta Moon and Blue Raspberry.">
         </figure>
       </aside>
+
+      <aside class="note rv">
+        <h3>Zeus House Captain — age 16</h3>
+        <p>
+          I ran for Zeus House Captain with nothing to point to. No track
+          record, no big pitch — just "if I win I win, if I don't I don't. I
+          have nothing to lose." I have dyslexia, and I built my statement
+          around what that had actually taught me: showing up every day,
+          working through things other people don't have to think about,
+          taking commitments seriously because I'd had to.
+        </p>
+        <p>
+          I built my own campaign posters and killed four drafts in one
+          evening — too corny, too plain, missing a line, wrong face. The
+          fifth one I kept. A friend who'd promised to help me win switched to
+          backing my rival mid-campaign and told me himself. I lost.
+        </p>
+        <p>
+          What actually stuck with me wasn't the loss. That month I was also
+          running Instagram, building a website, drafting a college
+          application, and starting a training programme — the election got
+          whatever attention was left over. I decided afterward to stop
+          spreading myself across everything at once and put real focus behind
+          fewer things. PRAZE is what came out of that decision.
+        </p>
+      </aside>
     </div>
   </section>
 
@@ -730,7 +785,7 @@ footer{
   <section class="sec" id="skills">
     <div class="wrap">
       <div class="sec-head rv">
-        <span class="sec-num">02 / Skills</span>
+        <span class="sec-num">03 / Skills</span>
         <h2>What I can actually do</h2>
         <p>All of this came from building the things above, not from a course.</p>
       </div>
@@ -778,7 +833,7 @@ footer{
   <section class="sec" id="contact">
     <div class="wrap">
       <div class="sec-head rv">
-        <span class="sec-num">03 / Contact</span>
+        <span class="sec-num">04 / Contact</span>
       </div>
 
       <div class="rv">
@@ -862,7 +917,7 @@ footer{
   }
 
   /* highlight the nav link for whichever section you're looking at */
-  var sections = ["work", "skills", "contact"].map(function (id) {
+  var sections = ["work", "before-praze", "skills", "contact"].map(function (id) {
     return document.getElementById(id);
   });
   var links = {};
