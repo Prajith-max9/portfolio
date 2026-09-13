@@ -32,6 +32,18 @@
      apply when scripts actually run. No JS, no class, nothing hidden. -->
 <script>document.documentElement.classList.add("js")</script>
 
+<!-- GSAP + ScrollTrigger, deferred so neither blocks render, and pinned by
+     SRI hash so a compromised CDN can't execute anything else. If either
+     fails, is blocked, or the hash mismatches, window.gsap stays undefined
+     and the IntersectionObserver reveal at the bottom of the page runs
+     instead — the page never depends on these loading. -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"
+        integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"
+        integrity="sha512-OaIE7ud4P04EhnBuhEcm0wQSceIxbi2pV03oBLS/+F6ampfxsnxcIxOp7H2eF9G7N0kEht0VAzOLG+dTLSo17Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <title>Prajith Ganesh M — Building PRAZE</title>
 <meta name="description" content="16-year-old builder from Chennai, India. Building PRAZE — a self-improvement brand spanning fitness, business, and content. Offline-first apps, content systems, and shipped work.">
 <meta name="theme-color" content="#08080a">
@@ -144,18 +156,33 @@ body::after{
 .mark span{color:var(--accent)}
 .nav-links{display:flex;gap:26px}
 .nav-links a{
+  position:relative;
   text-decoration:none;font-size:13.5px;letter-spacing:.04em;color:var(--text-dim);
-  transition:color .18s;
+  transition:color .22s cubic-bezier(.22,.61,.36,1);
 }
+/* Underline wipes in from the left on hover and holds while the section is
+   the active one. scaleX on a 1px bar, so it costs nothing to animate. */
+.nav-links a::after{
+  content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;
+  background:var(--accent);
+  transform:scaleX(0);transform-origin:left center;
+  transition:transform .28s cubic-bezier(.22,.61,.36,1);
+}
+.nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1)}
 .nav-links a:hover,.nav-links a.active{color:var(--text)}
 @media (max-width:560px){ .nav-links{gap:18px} .nav-links a{font-size:12.5px} }
 
 /* ----------------------------------------------------------------- hero --- */
 .hero{padding:clamp(70px,13vh,130px) 0 clamp(64px,10vh,104px);position:relative}
+/* --glow-y is the parallax hook. A pseudo-element has no DOM node, so GSAP
+   can't target it; it animates this custom property on .hero instead and the
+   pseudo-element reads it. Defaults to 0, so with no JS it simply sits still. */
 .hero::before{
-  content:"";position:absolute;top:-140px;left:50%;transform:translateX(-50%);
+  content:"";position:absolute;top:-140px;left:50%;
+  transform:translate(-50%,var(--glow-y,0px));
   width:min(900px,120vw);height:460px;pointer-events:none;
   background:radial-gradient(ellipse at center,rgba(242,100,58,.11),transparent 68%);
+  will-change:transform;
 }
 .hero > .wrap{position:relative}
 
@@ -225,9 +252,14 @@ section[id]{scroll-margin-top:74px}
   border-radius:4px;
   padding:clamp(24px,4.2vw,40px);
   position:relative;
-  transition:border-color .25s, transform .25s;
+  /* Eased rather than linear, and slightly slower on the way out than in —
+     a lift that settles instead of snapping. Kept in CSS on purpose: a 2px
+     transform is already compositor-driven, so routing it through JS would
+     add listeners and a possible conflict for no visible gain. */
+  transition:border-color .3s cubic-bezier(.22,.61,.36,1),
+             transform .3s cubic-bezier(.22,.61,.36,1);
 }
-.card:hover{border-color:#2c2c34;transform:translateY(-2px)}
+.card:hover{border-color:#2c2c34;transform:translateY(-3px)}
 
 .card-top{
   display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px;
@@ -323,8 +355,11 @@ section[id]{scroll-margin-top:74px}
   border-bottom:1px solid transparent;padding-bottom:2px;transition:.18s;
 }
 .card-link:hover{border-bottom-color:var(--accent)}
-.card-link::after{content:"→";transition:transform .18s}
-.card-link:hover::after{transform:translateX(3px)}
+.card-link::after{
+  content:"→";
+  transition:transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.card-link:hover::after{transform:translateX(4px)}
 
 /* Before-PRAZE stories. One rule set, three asides, so they can't drift
    apart visually. The global p{margin:0} means multi-paragraph stories need
@@ -386,6 +421,8 @@ footer{
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .js .rv{opacity:1;transform:none;transition:none}
+  .nav-links a::after{transition:none}
+  .hero::before{--glow-y:0px!important}
   .card:hover{transform:none}
   *{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
@@ -908,13 +945,25 @@ footer{
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  /* reveal on scroll — skipped entirely if the user prefers reduced motion */
+  /* ---------- reveal on scroll ----------
+     Three paths, in order of preference:
+       1. GSAP + ScrollTrigger, if both loaded  — staggered, eased
+       2. IntersectionObserver                  — the original CSS reveal
+       3. everything visible immediately        — reduced motion, or no IO
+     The CDN is treated as optional throughout: nothing below assumes it
+     loaded, and a hung request can't leave content hidden (see the safety
+     timeout at the end). */
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var items = document.querySelectorAll(".rv");
+  var revealStarted = false;
 
-  if (reduce || !("IntersectionObserver" in window)) {
+  function showAll() {
+    revealStarted = true;
     items.forEach(function (el) { el.classList.add("in"); });
-  } else {
+  }
+
+  function observerReveal() {
+    revealStarted = true;
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) {
@@ -924,6 +973,79 @@ footer{
       });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
     items.forEach(function (el) { io.observe(el); });
+  }
+
+  function gsapReveal() {
+    revealStarted = true;
+    var gsap = window.gsap;
+    gsap.registerPlugin(window.ScrollTrigger);
+
+    /* The CSS hides .rv via a class the stylesheet owns. Hand that job to
+       GSAP so it isn't animating against a live CSS transition: add .in to
+       everything (neutralising the stylesheet), then re-hide from JS. */
+    gsap.set(items, { opacity: 0, y: 14 });
+    items.forEach(function (el) { el.classList.add("in"); });
+
+    /* batch() groups whatever enters together, so a row of three story
+       cards staggers but a single tall project card just fades. 60ms is
+       enough to read as sequence without anything feeling slow. */
+    window.ScrollTrigger.batch(items, {
+      /* "top bottom-=60" not "top 92%": elements near the end of the page
+         can sit below 92% of the viewport even at maximum scroll, so a
+         percentage start silently never fires for them. Measuring from the
+         viewport bottom guarantees anything that can be seen reveals. */
+      start: "top bottom-=60",
+      once: true,
+      onEnter: function (batch) {
+        gsap.to(batch, {
+          opacity: 1, y: 0,
+          duration: 0.55,
+          ease: "power2.out",
+          stagger: 0.06,
+          overwrite: true
+        });
+      }
+    });
+
+    /* Trigger positions are measured once. Anything that changes document
+       height afterwards (a late image, a font swap) leaves them stale, so
+       recompute after the load event. */
+    window.addEventListener("load", function () { window.ScrollTrigger.refresh(); });
+
+    /* Hero glow drifts down at roughly a third of scroll speed. Scrubbed
+       rather than tweened so it tracks the scrollbar exactly, and driven
+       through a custom property because ::before has no DOM node. */
+    var hero = document.querySelector(".hero");
+    if (hero) {
+      gsap.to(hero, {
+        "--glow-y": "90px",
+        ease: "none",
+        scrollTrigger: {
+          trigger: hero,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.4
+        }
+      });
+    }
+  }
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    showAll();
+  } else {
+    /* Deferred scripts finish before DOMContentLoaded, so by here GSAP has
+       either loaded or definitively failed. */
+    window.addEventListener("DOMContentLoaded", function () {
+      if (window.gsap && window.ScrollTrigger) {
+        try { gsapReveal(); } catch (e) { observerReveal(); }
+      } else {
+        observerReveal();
+      }
+    });
+    /* Safety net: a CDN that hangs rather than fails would delay
+       DOMContentLoaded indefinitely, and .js .rv is opacity:0 until
+       something reveals it. Never let that strand the content. */
+    window.setTimeout(function () { if (!revealStarted) showAll(); }, 2500);
   }
 
   /* highlight the nav link for whichever section you're looking at */
