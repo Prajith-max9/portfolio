@@ -47,7 +47,11 @@
 <meta name="description" content="16-year-old builder from Chennai, India. Building PRAZE — a self-improvement brand spanning fitness, business, and content. Offline-first apps, content systems, and shipped work.">
 <meta name="theme-color" content="#08080a">
 
+<link rel="canonical" href="https://prajith.net/">
+
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="PRAZE">
+<meta property="og:locale" content="en_US">
 <meta property="og:title" content="Prajith Ganesh M — Building PRAZE">
 <meta property="og:description" content="Offline-first apps, a content brand, and an automated video pipeline. Built while finishing school in Chennai.">
 
@@ -221,6 +225,12 @@ body::after{
   .fact:last-child{border-bottom:0}
 }
 
+/* One quiet line of present tense under the fact strip. Deliberately not a
+   heading and not its own section — it reads as a footnote to the facts. */
+.now{
+  margin-top:22px;font-size:14.5px;color:var(--text-dim);max-width:58ch;
+}
+
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:38px}
 .btn{
   display:inline-block;text-decoration:none;font-size:14.5px;font-weight:600;
@@ -262,6 +272,13 @@ section[id]{scroll-margin-top:74px}
 
 .card-top{
   display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px;
+}
+/* Proof points: the card's own claims, compressed to a scannable line for
+   anyone reading headings only. Every item here restates something already
+   written further down the same card. */
+.proof{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;
+  color:var(--text-dim);margin-top:2px;
 }
 .card-idx{
   font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.1em;
@@ -354,11 +371,24 @@ section[id]{scroll-margin-top:74px}
   border-bottom:1px solid transparent;padding-bottom:2px;transition:.18s;
 }
 .card-link:hover{border-bottom-color:var(--accent)}
-.card-link::after{
-  content:"→";
-  transition:transform .3s cubic-bezier(.22,.61,.36,1);
+
+/* External-link cue. A north-east arrow means "leaves this page", which a
+   plain → does not, so every target="_blank" link carries one. It is
+   aria-hidden: the accessible name already ends with "(opens in new tab)",
+   and announcing a glyph on top of that is just noise.
+
+   On .card-link this replaces the old → rather than sitting beside it — two
+   arrows on one link is not understated, and the ↗ says more. The hover
+   motion is kept, redirected diagonally to match the glyph. */
+.ext{
+  display:inline-block;font-size:.85em;line-height:1;margin-left:.35em;
+  color:var(--text-mute);
+  transition:transform .3s cubic-bezier(.22,.61,.36,1),
+             color .3s cubic-bezier(.22,.61,.36,1);
 }
-.card-link:hover::after{transform:translateX(4px)}
+a:hover .ext,a:focus-visible .ext{transform:translate(2px,-2px);color:var(--accent)}
+.card-link .ext{color:var(--accent);font-size:.9em;margin-left:0}
+.card-link::after{content:none}
 
 /* Before-PRAZE stories. One rule set, three asides, so they can't drift
    apart visually. The global p{margin:0} means multi-paragraph stories need
@@ -392,7 +422,26 @@ section[id]{scroll-margin-top:74px}
 }
 .contact-sub{color:var(--text-dim);margin-top:16px;max-width:56ch;font-size:15.5px}
 .contact-list{margin-top:34px;border-top:1px solid var(--line)}
-.contact-list li{border-bottom:1px solid var(--line)}
+/* Flex so a row can hold the link plus the copy button. The link keeps its own
+   internal flex and takes the free space, so the Instagram row (link only)
+   looks identical to before. */
+.contact-list li{
+  display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid var(--line);
+}
+.contact-list li > a{flex:1 1 auto;min-width:0}
+
+.copy-btn{
+  flex:0 0 auto;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-dim);
+  background:none;border:1px solid var(--line);border-radius:2px;
+  padding:7px 12px;cursor:pointer;
+  transition:color .22s cubic-bezier(.22,.61,.36,1),
+             border-color .22s cubic-bezier(.22,.61,.36,1);
+}
+.copy-btn:hover{color:var(--text);border-color:var(--text-mute)}
+.copy-btn[data-copied]{color:var(--accent);border-color:var(--accent-dim)}
 .contact-list a{
   display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:17px 0;text-decoration:none;transition:padding .2s,color .2s;
@@ -477,6 +526,9 @@ footer{
         </div>
       </dl>
 
+      <p class="now">Currently: finishing AS Levels, training, and building
+        whatever's next for PRAZE.</p>
+
       <div class="cta">
         <a class="btn btn-solid" href="#work">See the work</a>
         <a class="btn btn-ghost" href="#contact">Get in touch</a>
@@ -504,6 +556,7 @@ footer{
             <span class="card-idx">01</span>
             <h3>PRAZE Fitness Tracker</h3>
           </div>
+          <p class="proof">3 iterations · Offline-first · Android</p>
 
           <div class="tags">
             <span class="tag">HTML / CSS / JS</span>
@@ -534,6 +587,24 @@ footer{
                 <strong>Use it, find the gap, ship the fix.</strong> That loop
                 is the part I care about.
               </p>
+            </div>
+
+            <!-- Screenshots sit above the technical breakdown so the visual
+                 proof lands before the detail. Placed after both intro blocks
+                 rather than between them: .blocks is a two-column grid and
+                 .shots spans 1/-1, so splitting the pair would leave each of
+                 them stranded in a half-empty row. -->
+            <div class="shots two shots--phone">
+              <figure class="shot">
+                <img src="images/tracker-log.webp" width="1075" height="2050" loading="lazy" decoding="async"
+                     alt="The tracker's logging screen: an open session with sets tagged as warm-up, working and drop, a weight and reps stepper, and a Log Set button.">
+                <figcaption>Logging · tagged sets <span class="sd">(sample data)</span></figcaption>
+              </figure>
+              <figure class="shot">
+                <img src="images/tracker-journey.webp" width="1075" height="2050" loading="lazy" decoding="async"
+                     alt="The Journey view showing bodyweight going from 67.4 to 70.1 kg over a month.">
+                <figcaption>Journey · progress over time <span class="sd">(sample data)</span></figcaption>
+              </figure>
             </div>
 
             <div class="block block-wide">
@@ -569,22 +640,12 @@ footer{
               </div>
             </div>
 
-            <div class="shots two shots--phone">
-              <figure class="shot">
-                <img src="images/tracker-log.webp" width="1075" height="2050" loading="lazy" decoding="async"
-                     alt="The tracker's logging screen: an open session with sets tagged as warm-up, working and drop, a weight and reps stepper, and a Log Set button.">
-                <figcaption>Logging · tagged sets <span class="sd">(sample data)</span></figcaption>
-              </figure>
-              <figure class="shot">
-                <img src="images/tracker-journey.webp" width="1075" height="2050" loading="lazy" decoding="async"
-                     alt="The Journey view showing bodyweight going from 67.4 to 70.1 kg over a month.">
-                <figcaption>Journey · progress over time <span class="sd">(sample data)</span></figcaption>
-              </figure>
-            </div>
           </div>
 
-          <a class="card-link" href="https://prajith-max9.github.io/praze-website/fitness.html" target="_blank" rel="noopener">
-            Open the live app
+          <a class="card-link" href="https://prajith-max9.github.io/praze-website/fitness.html"
+             target="_blank" rel="noopener"
+             aria-label="Open the PRAZE Fitness Tracker live app (opens in new tab)">
+            Open the live app<span class="ext" aria-hidden="true">↗</span>
           </a>
         </article>
 
@@ -594,6 +655,7 @@ footer{
             <span class="card-idx">02</span>
             <h3>PRAZE Second Brain</h3>
           </div>
+          <p class="proof">TF-IDF auto-linking · Offline retrieval · Knowledge graph</p>
 
           <div class="tags">
             <span class="tag">TF-IDF</span>
@@ -625,17 +687,10 @@ footer{
               </p>
             </div>
 
-            <div class="block block-wide">
-              <span class="label">What I built</span>
-              <ul class="bullets">
-                <li><strong>TF-IDF auto-linking</strong> finds related notes by content similarity, so connections show up without me tagging anything by hand.</li>
-                <li><strong>Wiki-style linking</strong> and a <strong>visual knowledge graph</strong> with pan and zoom, so I can see how ideas cluster.</li>
-                <li><strong>Local retrieval-based "Ask"</strong> answers questions from my own notes entirely offline. There's an optional AI-powered mode when I want it.</li>
-                <li><strong>Command palette (Cmd+K)</strong> for keyboard-first navigation, and <strong>voice dictation</strong> for diary entries.</li>
-                <li>Shipped across <strong>multiple pull requests, all merged and live</strong>, in reviewable increments rather than one dump of code.</li>
-              </ul>
-            </div>
-
+            <!-- Screenshots ahead of the feature list, matching the tracker
+                 card. Placed after both intro blocks rather than between them:
+                 .blocks is a two-column grid and .shots spans 1/-1, so
+                 splitting the pair would strand each in a half-empty row. -->
             <div class="shots shots--wide">
               <figure class="shot">
                 <img src="images/brain-graph.webp" width="2250" height="1600" loading="lazy" decoding="async"
@@ -648,10 +703,24 @@ footer{
                 <figcaption>Offline Ask · local retrieval <span class="sd">(sample data)</span></figcaption>
               </figure>
             </div>
+
+            <div class="block block-wide">
+              <span class="label">What I built</span>
+              <ul class="bullets">
+                <li><strong>TF-IDF auto-linking</strong> finds related notes by content similarity, so connections show up without me tagging anything by hand.</li>
+                <li><strong>Wiki-style linking</strong> and a <strong>visual knowledge graph</strong> with pan and zoom, so I can see how ideas cluster.</li>
+                <li><strong>Local retrieval-based "Ask"</strong> answers questions from my own notes entirely offline. There's an optional AI-powered mode when I want it.</li>
+                <li><strong>Command palette (Cmd+K)</strong> for keyboard-first navigation, and <strong>voice dictation</strong> for diary entries.</li>
+                <li>Shipped across <strong>multiple pull requests, all merged and live</strong>, in reviewable increments rather than one dump of code.</li>
+              </ul>
+            </div>
+
           </div>
 
-          <a class="card-link" href="https://prajith-max9.github.io/praze-website/brain.html" target="_blank" rel="noopener">
-            Open the live app
+          <a class="card-link" href="https://prajith-max9.github.io/praze-website/brain.html"
+             target="_blank" rel="noopener"
+             aria-label="Open the PRAZE Second Brain live app (opens in new tab)">
+            Open the live app<span class="ext" aria-hidden="true">↗</span>
           </a>
         </article>
 
@@ -661,6 +730,7 @@ footer{
             <span class="card-idx">03</span>
             <h3>@praze_ig — Content Brand</h3>
           </div>
+          <p class="proof">Custom colour system · ffmpeg grading · Film grain and vignette</p>
 
           <div class="tags">
             <span class="tag">Brand identity</span>
@@ -705,6 +775,7 @@ footer{
             <span class="card-idx">04</span>
             <h3>Vertical Reel Production Pipeline</h3>
           </div>
+          <p class="proof">Local speech-to-text · Word-level captions · Remotion</p>
 
           <div class="tags">
             <span class="tag">TypeScript</span>
@@ -900,11 +971,18 @@ footer{
               <span class="k">Email</span>
               <span class="v" data-email-text>prajithganesh.m@gmail.com</span>
             </a>
+            <!-- Addition, not a replacement: the mailto: above still works for
+                 anyone who prefers it. aria-live announces the confirmation,
+                 and describedby borrows the address as context so the button's
+                 name can stay the single word it displays. -->
+            <button type="button" class="copy-btn" id="copy-email"
+                    aria-live="polite" aria-describedby="email-link">Copy</button>
           </li>
           <li>
-            <a href="https://instagram.com/praze_ig" target="_blank" rel="noopener">
+            <a href="https://instagram.com/praze_ig" target="_blank" rel="noopener"
+               aria-label="Instagram, @praze_ig (opens in new tab)">
               <span class="k">Instagram</span>
-              <span class="v">@praze_ig</span>
+              <span class="v">@praze_ig<span class="ext" aria-hidden="true">↗</span></span>
             </a>
           </li>
         </ul>
@@ -934,6 +1012,56 @@ footer{
     document.querySelectorAll("[data-email-text]").forEach(function (el) {
       el.textContent = addr;
     });
+
+    /* Copy to clipboard, reading the same single source of truth as above so
+       it can never drift from the mailto:. */
+    var copyBtn = document.getElementById("copy-email");
+    if (copyBtn) {
+      var idleLabel = copyBtn.textContent;
+      var resetTimer = null;
+
+      function finish(ok) {
+        copyBtn.textContent = ok ? "Copied" : "Copy failed";
+        if (ok) copyBtn.setAttribute("data-copied", "");
+        window.clearTimeout(resetTimer);
+        resetTimer = window.setTimeout(function () {
+          copyBtn.textContent = idleLabel;
+          copyBtn.removeAttribute("data-copied");
+        }, 2000);
+      }
+
+      /* navigator.clipboard only exists in a secure context. The site is
+         http-only until the certificate is issued, so it would be undefined
+         for real visitors right now — hence the selection fallback, which
+         works on plain http. */
+      function legacyCopy() {
+        try {
+          var ta = document.createElement("textarea");
+          ta.value = addr;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "-1000px";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          finish(ok);
+        } catch (e) {
+          finish(false);
+        }
+      }
+
+      copyBtn.addEventListener("click", function () {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(addr).then(function () {
+            finish(true);
+          }, legacyCopy);
+        } else {
+          legacyCopy();
+        }
+      });
+    }
   }
 
   /* sticky nav gets a border + blur once you leave the hero */
