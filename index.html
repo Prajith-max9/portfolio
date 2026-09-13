@@ -955,6 +955,7 @@ footer{
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var items = document.querySelectorAll(".rv");
   var revealStarted = false;
+  var safetyTimer = null;
 
   function showAll() {
     revealStarted = true;
@@ -962,7 +963,9 @@ footer{
   }
 
   function observerReveal() {
+    if (revealStarted) return;
     revealStarted = true;
+    if (safetyTimer) { window.clearTimeout(safetyTimer); safetyTimer = null; }
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) {
@@ -975,7 +978,15 @@ footer{
   }
 
   function gsapReveal() {
+    /* If the safety net already revealed the page, leave it revealed. Without
+       this, a script that arrives after the 2.5s timeout would re-hide
+       everything via the gsap.set below — content flashing in and then
+       vanishing, which is worse than never animating at all. */
+    if (revealStarted) return;
     revealStarted = true;
+    /* Nothing can un-reveal the page from here, but clear the pending timer
+       so it cannot fire mid-animation and slam opacity to 1. */
+    if (safetyTimer) { window.clearTimeout(safetyTimer); safetyTimer = null; }
     var gsap = window.gsap;
     gsap.registerPlugin(window.ScrollTrigger);
 
@@ -1044,7 +1055,10 @@ footer{
     /* Safety net: a CDN that hangs rather than fails would delay
        DOMContentLoaded indefinitely, and .js .rv is opacity:0 until
        something reveals it. Never let that strand the content. */
-    window.setTimeout(function () { if (!revealStarted) showAll(); }, 2500);
+    safetyTimer = window.setTimeout(function () {
+      safetyTimer = null;
+      if (!revealStarted) showAll();
+    }, 2500);
   }
 
   /* highlight the nav link for whichever section you're looking at */
