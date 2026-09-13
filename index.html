@@ -946,7 +946,7 @@ footer{
 
   /* ---------- reveal on scroll ----------
      Three paths, in order of preference:
-       1. GSAP + ScrollTrigger, if both loaded  — staggered, eased
+       1. GSAP + ScrollTrigger, if both loaded  — per-element, eased
        2. IntersectionObserver                  — the original CSS reveal
        3. everything visible immediately        — reduced motion, or no IO
      The CDN is treated as optional throughout: nothing below assumes it
@@ -996,25 +996,26 @@ footer{
     gsap.set(items, { opacity: 0, y: 14 });
     items.forEach(function (el) { el.classList.add("in"); });
 
-    /* batch() groups whatever enters together, so a row of three story
-       cards staggers but a single tall project card just fades. 60ms is
-       enough to read as sequence without anything feeling slow. */
-    window.ScrollTrigger.batch(items, {
-      /* "top bottom-=60" not "top 92%": elements near the end of the page
-         can sit below 92% of the viewport even at maximum scroll, so a
-         percentage start silently never fires for them. Measuring from the
-         viewport bottom guarantees anything that can be seen reveals. */
-      start: "top bottom-=60",
-      once: true,
-      onEnter: function (batch) {
-        gsap.to(batch, {
-          opacity: 1, y: 0,
-          duration: 0.55,
-          ease: "power2.out",
-          stagger: 0.06,
-          overwrite: true
-        });
-      }
+    /* One trigger per element, no batching and no stagger. Each item reveals
+       strictly when it personally crosses the line, so the pacing is set by
+       how fast the visitor scrolls rather than by a fixed offset applied to
+       whatever happened to enter together. */
+    items.forEach(function (el) {
+      gsap.to(el, {
+        opacity: 1, y: 0,
+        duration: 0.55,
+        ease: "power2.out",
+        overwrite: true,
+        scrollTrigger: {
+          trigger: el,
+          /* "top bottom-=60" not "top 92%": elements near the end of the page
+             can sit below 92% of the viewport even at maximum scroll, so a
+             percentage start silently never fires for them. Measuring from
+             the viewport bottom guarantees anything visible reveals. */
+          start: "top bottom-=60",
+          once: true
+        }
+      });
     });
 
     /* Trigger positions are measured once. Anything that changes document
