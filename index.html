@@ -32,17 +32,16 @@
      apply when scripts actually run. No JS, no class, nothing hidden. -->
 <script>document.documentElement.classList.add("js")</script>
 
-<!-- GSAP + ScrollTrigger, deferred so neither blocks render, and pinned by
-     SRI hash so a compromised CDN can't execute anything else. If either
-     fails, is blocked, or the hash mismatches, window.gsap stays undefined
-     and the IntersectionObserver reveal at the bottom of the page runs
-     instead — the page never depends on these loading. -->
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"
-        integrity="sha512-oJ8QbaQThQoJZ7oEv+29jfPM6CcP+zUxh3PKJs1vyOhx0UraUrE7PQgeItu3dOuCJyrzWpoYMsVjkkPEBzbUqw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"
-        integrity="sha512-OaIE7ud4P04EhnBuhEcm0wQSceIxbi2pV03oBLS/+F6ampfxsnxcIxOp7H2eF9G7N0kEht0VAzOLG+dTLSo17Q=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- GSAP 3.15.0 + ScrollTrigger, self-hosted from ./js so the page makes no
+     third-party requests. Deferred, so neither blocks render. SRI and
+     crossorigin are gone on purpose: they exist to constrain a third party,
+     and these now ship from the same origin as the page.
+
+     Still treated as optional. If either 404s or is blocked, window.gsap
+     stays undefined and the IntersectionObserver reveal further down runs
+     instead — the page never depends on them loading. -->
+<script defer src="js/gsap.min.js"></script>
+<script defer src="js/ScrollTrigger.min.js"></script>
 
 <title>Prajith Ganesh M — Building PRAZE</title>
 <meta name="description" content="16-year-old builder from Chennai, India. Building PRAZE — a self-improvement brand spanning fitness, business, and content. Offline-first apps, content systems, and shipped work.">
